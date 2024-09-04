@@ -1,9 +1,8 @@
+await import("./env.js");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    appDir: true,
-  },
-}
+};
 
-export default nextConfig
+export default nextConfig;

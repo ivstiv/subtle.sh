@@ -1,10 +1,33 @@
-# editorconfig.org
+# Top-most EditorConfig file
 root = true
 
+# Default settings for all files
 [*]
-charset = utf-8
-end_of_line = lf
-indent_size = 2
 indent_style = space
-insert_final_newline = true
+indent_size = 2
+end_of_line = lf
+charset = utf-8
 trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 80
+
+# Settings for Markdown and JSON files
+[*.{md,json}]
+max_line_length = off
+indent_size = 2
+
+# Settings for YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# Settings for HTML, CSS, and similar files
+[*.{html,css,scss,less}]
+indent_size = 2
+
+# Settings for JavaScript, TypeScript, JSX, and TSX
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+
+# Ignore generated files (e.g., build directories, dependency files)
+[*.{min.js,min.css,lock}]
+insert_final_newline = false

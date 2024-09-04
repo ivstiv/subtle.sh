@@ -1,22 +1,31 @@
-# next-template
+# subtle.sh
 
-A Next.js 13 template for building apps with Radix UI and Tailwind CSS.
 
-## Usage
+## Development
+
+To run the app locally, you need to have `pnpm` installed. Then, you can install the dependencies and start the development server with:
 
 ```bash
-npx create-next-app -e https://github.com/shadcn/next-template
+cp .env.example .env
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-## Features
 
-- Next.js 13 App Directory
-- Radix UI Primitives
-- Tailwind CSS
-- Icons from [Lucide](https://lucide.dev)
-- Dark mode with `next-themes`
-- Tailwind CSS class sorting, merging and linting.
 
-## License
+## Why not supporting disconnect events?
 
-Licensed under the [MIT license](https://github.com/shadcn/ui/blob/main/LICENSE.md).
+Having a refresh button is a good compromise. Otherwise there are two ways to go about this:
+
+1. Use pusher presence channels (less work)
+
+- needs authorization endpoint
+- needs ngrok to tunnel the requests to that endpoint on dev
+- the only reason for the endpoint to exist is to abide to the pusher protocol (no security enhancements)
+- if I am going to be doing that I might as well build a full dockerised dev env
+
+2. DIY websocket server with redis
+
+- too much effort for a simple feature
+
+
