@@ -1,6 +1,5 @@
 # subtle.sh
 
-
 ## Development
 
 To run the app locally, you need to have `pnpm` installed. Then, you can install the dependencies and start the development server with:
@@ -10,8 +9,6 @@ cp .env.example .env
 pnpm install --frozen-lockfile
 pnpm dev
 ```
-
-
 
 ## Why not supporting disconnect events?
 
@@ -27,5 +24,3 @@ Having a refresh button is a good compromise. Otherwise there are two ways to go
 2. DIY websocket server with redis
 
 - too much effort for a simple feature
-
-

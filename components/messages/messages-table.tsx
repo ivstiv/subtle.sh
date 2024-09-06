@@ -9,7 +9,7 @@ export const MessagesTable = () => {
   const messages = useMessageStore((state) => state.messages);
   const data = useMemo(
     () =>
-      messages.map((m) => ({
+      messages.reverse().map((m) => ({
         id: m.id,
         label: {
           plainText: m.label.plainText,

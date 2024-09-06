@@ -8,24 +8,31 @@ import { v4 } from "uuid";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useToast } from "../ui/use-toast";
+import { useDecryptedMessage } from "@/data/use-decrypted-message";
 
-// TO-DO: implement default values passing in props
 type Props = {
   onSucessfulSubmit: () => void;
+  existingMessageId?: string;
 };
-export const useNewMessageForm = ({ onSucessfulSubmit }: Props) => {
+export const useNewMessageForm = ({
+  onSucessfulSubmit,
+  existingMessageId,
+}: Props) => {
   const sendPusherEvent = useGlobalStore((state) => state.sendPusherEvent);
   const myKeys = useGlobalStore((state) => state.myKeys);
   const participants = useParticipantStore((state) => state.participants);
   const addMessage = useMessageStore((state) => state.addMessage);
 
   const { toast } = useToast();
+  const existingMessage = useDecryptedMessage(existingMessageId);
 
   return useFormik({
+    isInitialValid: existingMessage.data !== undefined,
+    enableReinitialize: true,
     validationSchema,
     initialValues: {
-      label: "",
-      content: "",
+      label: existingMessage.data?.label.plainText ?? "",
+      content: existingMessage.data?.content.plainText ?? "",
     },
     onSubmit: async (values, form) => {
       if (myKeys.public === undefined) {
@@ -71,7 +78,7 @@ export const useNewMessageForm = ({ onSucessfulSubmit }: Props) => {
       onSucessfulSubmit();
 
       toast({
-        title: `Secret sent to ${recipients.length} recipient${recipients.length > 1 ? "s" : ""}`,
+        title: `Secret sent to ${recipients.length - 1} recipient${recipients.length - 1 > 1 ? "s" : ""}`,
       });
     },
   });

@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { MessagePreview } from "../message-preview";
+import { NewMessageDialog } from "../new-message/new-message-dialog";
 
 type MessageRow = {
   id: string;
@@ -122,11 +123,21 @@ export const columns: ColumnDef<MessageRow>[] = [
               Copy label
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <MessagePreview
-              encryptedLabel={message?.label.encryptedText ?? ""}
-              encryptedContent={message?.message.encryptedText ?? ""}
+            <MessagePreview messageId={row.original.id} />
+            <NewMessageDialog
+              existingMessageId={row.original.id}
+              trigger={
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    // prevent the dialog and dropdown from closing
+                    // TO-DO: figure out how to open dialog but close dropdown
+                    event.preventDefault();
+                  }}
+                >
+                  Resend
+                </DropdownMenuItem>
+              }
             />
-            <DropdownMenuItem disabled>Resend</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

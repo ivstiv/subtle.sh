@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -16,7 +16,11 @@ import { useParticipantStore } from "@/data/participant-store";
 import { useGlobalStore } from "@/data/global-store";
 import { useNewMessageForm } from "./use-new-message-form";
 
-export const NewMessageDialog = () => {
+type Props = {
+  trigger: ReactNode;
+  existingMessageId?: string;
+};
+export const NewMessageDialog = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<keyof typeof steps>("secretInput");
   const CurrentStep = useMemo(() => steps[step].component, [step]);
@@ -48,6 +52,7 @@ export const NewMessageDialog = () => {
   }, [participants, myKeys, step]);
 
   const form = useNewMessageForm({
+    existingMessageId: props.existingMessageId,
     onSucessfulSubmit: () => {
       setStep("secretInput");
       setIsOpen(false);
@@ -60,7 +65,7 @@ export const NewMessageDialog = () => {
 
   const isPrimaryBtnDisabled =
     form.isSubmitting || // while loading
-    !form.dirty || // when the form hasn't been touched. TO-DO: will break when re-sending is implemented as the form won't be dirty but valid
+    !form.isValid || // when the form is invalid
     errors.length > 0 || // when missing fields
     isActionDisabled; // when no trusted participants
 
@@ -73,9 +78,7 @@ export const NewMessageDialog = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button onClick={() => setIsOpen(true)}>New secret</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{props.trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{`Step ${titleData.currentStep} of ${titleData.totalSteps}`}</DialogTitle>
