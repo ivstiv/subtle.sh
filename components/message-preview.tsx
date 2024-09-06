@@ -6,59 +6,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useGlobalStore } from "@/data/global-store";
-import { decryptText } from "@/lib/crypto";
 import { useToast } from "./ui/use-toast";
 import { Loader2, ClipboardCopy } from "lucide-react";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { useDecryptedMessage } from "@/data/use-decrypted-message";
 
 type Props = {
-  encryptedLabel: string;
-  encryptedContent: string;
+  messageId: string;
 };
 
-export const MessagePreview = ({ encryptedLabel, encryptedContent }: Props) => {
+export const MessagePreview = ({ messageId }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [decryptedLabel, setDecryptedLabel] = useState<string | null>(null);
-  const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const myKeys = useGlobalStore((state) => state.myKeys);
+  const decryptedMessage = useDecryptedMessage(messageId);
   const { toast } = useToast();
-
-  const handleDecrypt = async () => {
-    if (!myKeys.public) {
-      toast({
-        title: "Error",
-        description: "No public key found. Unable to decrypt.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const [labelResult, contentResult] = await Promise.all([
-        decryptText(encryptedLabel),
-        decryptText(encryptedContent),
-      ]);
-
-      if (labelResult.isOk() && contentResult.isOk()) {
-        setDecryptedLabel(labelResult.value);
-        setDecryptedContent(contentResult.value);
-      } else {
-        throw new Error("Failed to decrypt message");
-      }
-    } catch {
-      toast({
-        title: "Decryption failed",
-        description: "Failed to decrypt message.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const copyToClipboard = async (text: string, description: string) => {
     await navigator.clipboard.writeText(text);
@@ -72,10 +33,8 @@ export const MessagePreview = ({ encryptedLabel, encryptedContent }: Props) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <DropdownMenuItem
-          // onClick={handleDecrypt}
           onSelect={(event) => {
             event.preventDefault();
-            void handleDecrypt();
           }}
         >
           Preview
@@ -86,7 +45,7 @@ export const MessagePreview = ({ encryptedLabel, encryptedContent }: Props) => {
           <DialogTitle>Message Preview</DialogTitle>
         </DialogHeader>
         <div className="grow overflow-y-auto">
-          {isLoading ? (
+          {decryptedMessage.isPending ? (
             <div className="flex justify-center p-4">
               <Loader2 className="size-8 animate-spin" />
             </div>
@@ -98,20 +57,25 @@ export const MessagePreview = ({ encryptedLabel, encryptedContent }: Props) => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    copyToClipboard(
-                      decryptedLabel ?? "",
+                  onClick={() => {
+                    if (!decryptedMessage.data) {
+                      throw new Error("Decrypted message data is undefined");
+                    }
+                    void copyToClipboard(
+                      decryptedMessage.data.label.plainText,
                       "Label copied to clipboard.",
-                    )
-                  }
-                  disabled={!decryptedLabel}
+                    );
+                  }}
+                  disabled={decryptedMessage.data === undefined}
                 >
                   <span className="sr-only">Copy label</span>
                   <ClipboardCopy className="size-4" />
                 </Button>
               </div>
               <div className="mb-4 rounded-md border p-2">
-                <p className="mt-1 whitespace-pre-wrap">{decryptedLabel}</p>
+                <p className="mt-1 whitespace-pre-wrap">
+                  {decryptedMessage.data?.label.plainText}
+                </p>
               </div>
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="font-semibold">Content</h3>
@@ -119,20 +83,25 @@ export const MessagePreview = ({ encryptedLabel, encryptedContent }: Props) => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    copyToClipboard(
-                      decryptedContent ?? "",
+                  onClick={() => {
+                    if (!decryptedMessage.data) {
+                      throw new Error("Decrypted message data is undefined");
+                    }
+                    void copyToClipboard(
+                      decryptedMessage.data.content.plainText,
                       "Content copied to clipboard.",
-                    )
-                  }
-                  disabled={!decryptedContent}
+                    );
+                  }}
+                  disabled={decryptedMessage.data === undefined}
                 >
                   <span className="sr-only">Copy content</span>
                   <ClipboardCopy className="size-4" />
                 </Button>
               </div>
               <div className="rounded-md border p-2">
-                <p className="mt-1 whitespace-pre-wrap">{decryptedContent}</p>
+                <p className="mt-1 whitespace-pre-wrap">
+                  {decryptedMessage.data?.content.plainText}
+                </p>
               </div>
             </div>
           )}

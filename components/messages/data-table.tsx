@@ -44,7 +44,7 @@ export const DataTable = <TData, TValue>({
     <div>
       <div className="mb-4 flex justify-between">
         <h1 className="text-2xl font-bold">Secrets</h1>
-        <NewMessageDialog />
+        <NewMessageDialog trigger={<Button>New secret</Button>} />
       </div>
       <div className="rounded-md border">
         <Table>
