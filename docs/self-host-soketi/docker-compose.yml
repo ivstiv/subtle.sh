@@ -1,5 +1,6 @@
-subtle-soketi-network:
-  driver: bridge
+networks:
+  subtle-soketi-network:
+    driver: bridge
 
 services:
   webserver:
