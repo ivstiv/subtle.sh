@@ -25,6 +25,7 @@ import {
 } from "../ui/tooltip";
 import { MessagePreview } from "../message-preview";
 import { NewMessageDialog } from "../new-message/new-message-dialog";
+import { getAvatarUrl } from "@/lib/utils";
 
 type MessageRow = {
   id: string;
@@ -70,7 +71,7 @@ export const columns: ColumnDef<MessageRow>[] = [
           row.original.recipients.includes(p.publicKey.getFingerprint()),
         )
         .map((p) => ({
-          src: "/avatars/01.png",
+          src: getAvatarUrl(p.publicKey.getFingerprint()),
           username: p.username,
         }));
       return <OverlappingAvatars avatars={avatars} />;

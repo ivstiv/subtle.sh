@@ -32,3 +32,7 @@ export const isWebSocketError = (error: unknown): error is WebSocketError => {
     "error" in error
   );
 };
+
+export const getAvatarUrl = (seed: string) => {
+  return `https://api.dicebear.com/9.x/thumbs/svg?seed=${seed.substring(0, 5)}`;
+};
