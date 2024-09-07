@@ -13,8 +13,9 @@ All jokes aside, this could be genuinely useful if you don’t share a password 
 ## Host your own server
 
 You can host your own server if you want to keep complete ownership of your sessions.
- - [Setup a backend on a cheap VPS](/docs/self-host-soketi/)
- - Host on railway.app from a template (TO-DO)
+
+- [Setup a backend on a cheap VPS](/docs/self-host-soketi/)
+- Host on railway.app from a template (TO-DO)
 
 ## Development
 

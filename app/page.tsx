@@ -10,6 +10,7 @@ import { SettingsModal } from "@/components/settings-modal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/config/site";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +30,7 @@ export default function Home() {
             className={buttonVariants({
               variant: "secondary",
             })}
-            href="https://github.com/ivstiv/subtle.sh"
+            href={siteConfig.links.github}
             target="_blank"
           >
             <Icons.gitHub className="size-4" />

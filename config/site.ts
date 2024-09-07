@@ -13,4 +13,7 @@ export const siteConfig = {
       href: "/about",
     },
   ],
+  links: {
+    github: "https://github.com/ivstiv/subtle.sh",
+  },
 };
