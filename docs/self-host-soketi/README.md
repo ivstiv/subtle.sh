@@ -18,7 +18,8 @@ wget -O - https://github.com/ivstiv/subtle.sh/archive/$DOCS_BRANCH.tar.gz | tar 
 ### 2. Replace the `your.domain` string with your domain
 ```bash
 YOUR_DOMAIN=whatever.yourdomain.is
-sed -i "s/your.domain/$YOUR_DOMAIN/g" nginx/conf/nginx.conf
+sed -i "s/your.domain/$YOUR_DOMAIN/g" nginx/nginx.conf
+sed -i "s/your.domain/$YOUR_DOMAIN/g" nginx-certbot/nginx.conf
 ```
 
 ### 3. Open ports in your firewall (if you're using one, example for ubuntu)
@@ -43,7 +44,12 @@ The dry run was successful.
 docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d "$YOUR_DOMAIN"
 ```
 
-### 6. Start the web socket service
+### 6. Stop the certbot webserver used for the generation
+```bash
+docker compose stop webserver-certbot
+```
+
+### 7. Start the web socket service
 ```bash
 docker compose up -d subtle-soketi
 ```

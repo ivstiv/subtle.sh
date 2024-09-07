@@ -3,6 +3,25 @@ networks:
     driver: bridge
 
 services:
+  webserver-certbot:
+    image: nginx:latest
+    container_name: subtle-certbot-webserver
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    depends_on:
+      - webserver-certbot
+
   webserver:
     image: nginx:latest
     container_name: subtle-soketi-webserver
@@ -13,17 +32,9 @@ services:
     networks:
       - subtle-soketi-network
     volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./nginx:/etc/nginx/conf.d/:ro
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/conf/:/etc/nginx/ssl/:ro
-
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
-    depends_on:
-      - webserver
 
   subtle-soketi:
     image: quay.io/soketi/soketi:1.6-16-debian
