@@ -1,12 +1,16 @@
-version: "3"
+subtle-soketi-network:
+  driver: bridge
 
 services:
   webserver:
     image: nginx:latest
+    container_name: subtle-soketi-webserver
     ports:
       - 80:80
       - 443:443
     restart: always
+    networks:
+      - subtle-soketi-network
     volumes:
       - ./nginx/conf/:/etc/nginx/conf.d/:ro
       - ./certbot/www:/var/www/certbot/:ro
@@ -17,3 +21,22 @@ services:
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
+    depends_on:
+      - webserver
+
+  subtle-soketi:
+    image: quay.io/soketi/soketi:1.6-16-debian
+    container_name: subtle-soketi
+    networks:
+      - subtle-soketi-network
+    hostname: subtle-soketi
+    environment:
+      SOKETI_DEFAULT_APP_ID: "your-app-id"
+      SOKETI_DEFAULT_APP_KEY: "your-app-key"
+      SOKETI_DEFAULT_APP_SECRET: "your-app-secret"
+      SOKETI_DEFAULT_APP_MAX_CONNS: 500
+      SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES: "true"
+      SOKETI_DEFAULT_APP_ENABLED: "true"
+    restart: always
+    depends_on:
+      - webserver
