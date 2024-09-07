@@ -1,13 +1,15 @@
 import Pusher from "pusher-js";
-import { IS_SERVER } from "./utils";
+import { IS_SERVER, isErrorWithMessage, isWebSocketError } from "./utils";
 import { z } from "zod";
 import { readKey } from "openpgp";
 import { useParticipantStore } from "@/data/participant-store";
-import { useGlobalStore } from "@/data/global-store";
+import { type Server, useGlobalStore } from "@/data/global-store";
 import { decryptText, verifySignature } from "./crypto";
 import { useMessageStore } from "@/data/message-store";
 import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
+import { err, ok, type Result } from "neverthrow";
+import { useQuery } from "@tanstack/react-query";
 
 type IntroductionEvent = z.infer<typeof IntroductionEvent>;
 const IntroductionEvent = z.object({
@@ -106,8 +108,9 @@ const EventHandlers = {
       .getState()
       .myKeys.public?.getFingerprint();
     if (myFingerPrint === undefined) {
-      // TO-DO: Add error to error store and report to UI
-      // we don't have a public key, we can't decrypt the message
+      toast({
+        title: "Error missing public key",
+      });
       return;
     }
 
@@ -120,9 +123,12 @@ const EventHandlers = {
       .getState()
       .participants.find((p) => p.publicKey.getFingerprint() === event.sender);
     if (sender === undefined) {
-      // TO-DO: sender was not found, propagate error to user
       // tell the user that the sender is not known
-      // this could be a malicious actor or to refresh the particopants list
+      // this could be a malicious actor or to refresh the participants list
+      toast({
+        title:
+          "Error unknown sender, please refresh the participants list or start a new session.",
+      });
       return;
     }
 
@@ -147,8 +153,10 @@ const EventHandlers = {
 
     const decryptedLabel = await decryptText(event.label.encryptedText);
     if (decryptedLabel.isErr()) {
-      // TO-DO: Add error to error store and report to UI
       // failed to decrypt message
+      toast({
+        title: "Error decrypting message",
+      });
       return;
     }
 
@@ -170,7 +178,10 @@ const handlePusherEvent = (event: unknown) => {
   const parsedEvent = PusherEvent.safeParse(event);
 
   if (!parsedEvent.success) {
-    // TO-DO: Add error to error store and report to UI
+    toast({
+      title: "Error parsing event",
+      description: `Failed to parse event: ${parsedEvent.error.message}`,
+    });
     return;
   }
 
@@ -194,18 +205,69 @@ export const initialisePusher = () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
+  const domain = urlParams.get("domain") ?? env.NEXT_PUBLIC_WEBSOCKET_HOST;
+  const appKey = urlParams.get("appKey") ?? env.NEXT_PUBLIC_WEBSOCKET_APP_KEY;
 
   if (!id?.trim()) {
     return;
   }
 
-  const pusher = new Pusher(env.NEXT_PUBLIC_WEBSOCKET_APP_KEY, {
+  const pusher = new Pusher(appKey, {
     cluster: "eu",
-    wsHost: env.NEXT_PUBLIC_WEBSOCKET_HOST,
+    wsHost: domain,
     forceTLS: true,
     enabledTransports: ["ws", "wss"],
   });
   const channel = pusher.subscribe(`session-${id}`);
   channel.bind("client-event", handlePusherEvent);
   return channel;
+};
+
+export const waitCheckServer = async (
+  server: Server,
+): Promise<Result<null, string>> => {
+  return new Promise((resolve) => {
+    const pusher = new Pusher(server.appKey, {
+      cluster: "eu",
+      wsHost: server.domain,
+      forceTLS: true,
+      enabledTransports: ["ws", "wss"],
+    });
+
+    const timeoutId = setTimeout(() => {
+      pusher.disconnect();
+      resolve(err("Connection timed out"));
+    }, 2000); // 2 seconds timeout
+
+    pusher.connection.bind("connected", () => {
+      clearTimeout(timeoutId);
+      pusher.disconnect();
+      resolve(ok(null));
+    });
+
+    pusher.connection.bind("error", (error: unknown) => {
+      clearTimeout(timeoutId);
+      pusher.disconnect();
+      const errorMessage = (() => {
+        if (isWebSocketError(error)) {
+          return error.error.data.message;
+        }
+        if (isErrorWithMessage(error)) {
+          return error.message;
+        }
+        return "unknown";
+      })();
+      resolve(err(`Connection error: ${errorMessage}`));
+    });
+  });
+};
+
+export const useServerStatus = (server: Server) => {
+  return useQuery({
+    queryKey: ["server-status", server.domain],
+    queryFn: async () => {
+      const result = await waitCheckServer(server);
+      return result.isOk() ? "online" : "offline";
+    },
+  });
 };

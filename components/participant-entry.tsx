@@ -20,70 +20,42 @@ export const ParticipantEntry = ({ participant }: Props) => {
   const setTrustLevel = useParticipantStore((state) => state.setTrustLevel);
 
   return (
-    <div
-      //   key={participant.publicKey.getFingerprint()}
-      className="flex items-center justify-between space-x-4"
-    >
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
       <Recipient participant={participant} />
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="ml-auto"
+            className="mt-2 w-full sm:mt-0 sm:w-auto"
             disabled={participant.isMe}
           >
             {TrustLevels[participant.trustLevel].label}
             <ChevronDown className="ml-2 size-4 text-muted-foreground" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0" align="end">
-          <Command>
+        <PopoverContent className="w-[280px] p-0" align="end">
+          <Command className="w-full">
             <CommandInput placeholder="Select new trust level..." />
             <CommandList>
               <CommandEmpty>No levels found.</CommandEmpty>
               <CommandGroup>
-                <CommandItem
-                  onSelect={() => {
-                    setTrustLevel(
-                      participant.publicKey.getFingerprint(),
-                      "trusted",
-                    );
-                  }}
-                  className="flex flex-col items-start space-y-1 px-4 py-2"
-                >
-                  <p>{TrustLevels.trusted.label}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {TrustLevels.trusted.description}
-                  </p>
-                </CommandItem>
-                <CommandItem
-                  onSelect={() => {
-                    setTrustLevel(
-                      participant.publicKey.getFingerprint(),
-                      "untrusted",
-                    );
-                  }}
-                  className="flex flex-col items-start space-y-1 px-4 py-2"
-                >
-                  <p>{TrustLevels.untrusted.label}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {TrustLevels.untrusted.description}
-                  </p>
-                </CommandItem>
-                <CommandItem
-                  onSelect={() => {
-                    setTrustLevel(
-                      participant.publicKey.getFingerprint(),
-                      "blocked",
-                    );
-                  }}
-                  className="flex flex-col items-start space-y-1 px-4 py-2"
-                >
-                  <p>{TrustLevels.blocked.label}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {TrustLevels.blocked.description}
-                  </p>
-                </CommandItem>
+                {Object.entries(TrustLevels).map(([key, value]) => (
+                  <CommandItem
+                    key={key}
+                    onSelect={() => {
+                      setTrustLevel(
+                        participant.publicKey.getFingerprint(),
+                        key as keyof typeof TrustLevels,
+                      );
+                    }}
+                    className="flex flex-col items-start space-y-1 px-4 py-2"
+                  >
+                    <p>{value.label}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {value.description}
+                    </p>
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>

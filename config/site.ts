@@ -2,8 +2,7 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "subtle.sh",
-  description:
-    "Beautifully designed components built with Radix UI and Tailwind CSS.",
+  description: "Send encrypted messages without leaving a trace.",
   mainNav: [
     {
       title: "Home",
@@ -14,7 +13,4 @@ export const siteConfig = {
       href: "/about",
     },
   ],
-  links: {
-    github: "https://github.com/shadcn/ui",
-  },
 };

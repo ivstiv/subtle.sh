@@ -14,6 +14,20 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: [
+    "subtle",
+    "subtle.sh",
+    "encrypted messages",
+    "privacy",
+    "secure",
+    "pgp",
+    "soketi",
+    "nextjs",
+    "react",
+    "tailwind",
+    "shadcn",
+    "ui",
+  ],
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
@@ -34,6 +48,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
+    // https://github.com/shadcn/next-contentlayer/issues/7
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
