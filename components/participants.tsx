@@ -39,46 +39,6 @@ export const Participants = () => {
       </div>
       <Card>
         <CardHeader>
-          {/* <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="mr-1"
-                onClick={reintroduce}
-              >
-                <span className="sr-only">Refresh participants</span>
-                <RefreshCcw className="h-4 w-4" />
-              </Button>
-              Participants
-            </CardTitle>
-            <div className="flex gap-2">
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Page {paginatedParticipants.currentPageIndex} of{" "}
-                {paginatedParticipants.totalPages}
-              </div>
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={paginatedParticipants.previousPage}
-                disabled={paginatedParticipants.currentPageIndex === 1}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-8 w-8 p-0"
-                onClick={paginatedParticipants.nextPage}
-                disabled={paginatedParticipants.currentPageIndex === paginatedParticipants.totalPages}
-              >
-                <span className="sr-only">Go to next page</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div> */}
-
           <CardDescription>
             Set trust levels to share secrets effectively.
           </CardDescription>

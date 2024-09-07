@@ -27,8 +27,10 @@ export const CopyEncryptedText = ({ encryptedText }: Props) => {
         const decrypted = await decryptText(encryptedText);
 
         if (decrypted.isErr()) {
-          // TO-DO: show error decrypting failed
-          console.error(decrypted.error);
+          toast({
+            title: "Error decrypting content",
+            description: decrypted.error,
+          });
           setLoading(false);
           return;
         }

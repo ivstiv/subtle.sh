@@ -36,7 +36,9 @@ export const useNewMessageForm = ({
     },
     onSubmit: async (values, form) => {
       if (myKeys.public === undefined) {
-        // TO-DO: show error missing public key
+        toast({
+          title: "Error missing public key",
+        });
         return;
       }
 
@@ -48,7 +50,9 @@ export const useNewMessageForm = ({
       ]);
 
       if (label.isErr() || message.isErr()) {
-        // TO-DO: show error encryption failed
+        toast({
+          title: "Error encrypting message",
+        });
         return;
       }
 

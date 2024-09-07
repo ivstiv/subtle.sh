@@ -4,7 +4,6 @@ import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useMemo } from "react";
 
-// TO-DO: implement better handling of invalid signatures
 export const MessagesTable = () => {
   const messages = useMessageStore((state) => state.messages);
   const data = useMemo(

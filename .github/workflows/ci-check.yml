@@ -1,0 +1,37 @@
+name: CI Check and Build
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci-check-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm run build
+        env:
+          NEXT_PUBLIC_WEBSOCKET_HOST: "dummy"
+          NEXT_PUBLIC_WEBSOCKET_APP_KEY: "dummy"
+
+      - name: Run ci-check
+        run: pnpm run ci-check
+        env:
+          NEXT_PUBLIC_WEBSOCKET_HOST: "dummy"
+          NEXT_PUBLIC_WEBSOCKET_APP_KEY: "dummy"
