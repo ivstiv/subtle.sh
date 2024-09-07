@@ -1,6 +1,7 @@
 import type { Participant } from "@/data/participant-store";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { getAvatarUrl } from "@/lib/utils";
 
 type Props = {
   participant: Participant;
@@ -9,7 +10,9 @@ export const Recipient = ({ participant }: Props) => {
   return (
     <div className="flex items-center space-x-2">
       <Avatar>
-        <AvatarImage src="/avatars/01.png" />
+        <AvatarImage
+          src={getAvatarUrl(participant.publicKey.getFingerprint())}
+        />
         <AvatarFallback>
           {participant.username.slice(0, 2).toUpperCase()}
         </AvatarFallback>
