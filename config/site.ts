@@ -2,7 +2,8 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "subtle.sh",
-  description: "Send encrypted messages without leaving a trace.",
+  description:
+    "E2E encrypted ephemeral messaging app. Share secrets securely without setup. Built with Next.js, Soketi, and OpenPGP.js. Self-hostable.",
   mainNav: [
     {
       title: "Home",

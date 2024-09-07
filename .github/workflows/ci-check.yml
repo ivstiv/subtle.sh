@@ -32,3 +32,6 @@ jobs:
 
       - name: Run ci-check
         run: pnpm run ci-check
+        env:
+          NEXT_PUBLIC_WEBSOCKET_HOST: "dummy"
+          NEXT_PUBLIC_WEBSOCKET_APP_KEY: "dummy"
