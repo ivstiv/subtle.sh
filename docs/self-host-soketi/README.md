@@ -11,7 +11,7 @@ The docs assume you have a domain and a server running Ubuntu 22.04.
 ```bash
 mkdir soketi
 cd soketi
-DOCS_BRANCH=self-host-soketi
+DOCS_BRANCH=main
 wget -O - https://github.com/ivstiv/subtle.sh/archive/$DOCS_BRANCH.tar.gz | tar -xz --strip=3 "subtle.sh-$DOCS_BRANCH/docs/self-host-soketi"
 ```
 
@@ -40,6 +40,7 @@ The dry run was successful.
 ```
 
 ### 5. Actually generate the certificate
+If you don't care about getting email reminders, you can generate the certificate with the `--register-unsafely-without-email` flag.
 ```bash
 docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d "$YOUR_DOMAIN"
 ```
@@ -49,21 +50,41 @@ docker compose run --rm  certbot certonly --webroot --webroot-path /var/www/cert
 docker compose stop webserver-certbot
 ```
 
-### 7. Start the web socket service
+### 7. Configure the app key and secret in the docker-compose.yml file
+May be just generate 3 random [UUIDs](https://www.uuidgenerator.net/), should be enough.
+```
+SOKETI_DEFAULT_APP_ID: "your-app-id"
+SOKETI_DEFAULT_APP_KEY: "your-app-key"
+SOKETI_DEFAULT_APP_SECRET: "your-app-secret"
+```
+
+### 8. Start the web socket service
 ```bash
 docker compose up -d subtle-soketi
 ```
 
+## Useful commands
 
-### 998. Renew the certificate
+### Check if the websocket service works
+```bash
+websocat "wss://your-domain/app/your-app-key"
+```
+
+### Renew certificates
 ```bash
 docker compose run --rm  certbot renew
 ```
 
-### 999. Didn't work?
- - Check logs: `docker compose logs`
- - Check containers: `docker compose ps`
- - Check Nginx logs: `docker compose exec nginx cat /var/log/nginx/error.log`
- - Ping me on Discord: [Invite](to-do)
+### Restart the services
+**Do it always after renewing certificates or making changes to environment variables**
+```bash
+docker compose down
+docker compose up -d subtle-soketi
+```
+
+## Didn't work?
+ - Check logs: `docker compose logs <service-name>` (subtle-soketi, webserver, etc. check docker-compose.yml)
+ - Check containers: `docker ps`
+ - Ping me on Discord: [Invite](https://discord.gg/VMSDGVD)
 
 

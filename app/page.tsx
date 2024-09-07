@@ -24,7 +24,7 @@ export default function Home() {
         <li className="text-left">
           <HoverCard>
             <HoverCardTrigger className="text-lg underline underline-offset-8 hover:cursor-pointer">
-              Minimal setup for quick sharing
+              One click setup for quick sharing
             </HoverCardTrigger>
             <HoverCardContent className="text-center">
               No account or settings to fiddle with. Just share a link.
@@ -38,18 +38,17 @@ export default function Home() {
             </HoverCardTrigger>
             <HoverCardContent className="text-center">
               No really, that&apos;s all there is. It&apos;s just a PGP client
-              without persistent keys.
+              with in-memory keys.
             </HoverCardContent>
           </HoverCard>
         </li>
         <li className="text-right">
           <HoverCard>
             <HoverCardTrigger className="text-lg underline underline-offset-8 hover:cursor-pointer">
-              No history to be leaked
+              Bring your own backend
             </HoverCardTrigger>
             <HoverCardContent className="text-center">
-              Simple by design, no history or persistence. Heck, not even a
-              database.
+              Simple by design, no history or persistence.
             </HoverCardContent>
           </HoverCard>
         </li>

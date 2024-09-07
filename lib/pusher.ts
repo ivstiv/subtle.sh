@@ -199,7 +199,7 @@ export const initialisePusher = () => {
     return;
   }
 
-  const pusher = new Pusher(env.NEXT_PUBLIC_WEBSOCKET_APP_ID, {
+  const pusher = new Pusher(env.NEXT_PUBLIC_WEBSOCKET_APP_KEY, {
     cluster: "eu",
     wsHost: env.NEXT_PUBLIC_WEBSOCKET_HOST,
     forceTLS: true,
