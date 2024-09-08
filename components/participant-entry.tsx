@@ -78,7 +78,8 @@ const TrustLevels = {
   },
   blocked: {
     label: "Blocked",
-    description: "Can't send and can't decrypt the secrets you send.",
+    description:
+      "Can't send and can't decrypt the secrets you send. Chat messages of blocked users are hidden.",
     level: "blocked",
   },
 } as const;
