@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { DoorOpen, Send } from "lucide-react";
-import Link from "next/link";
 import {
   type ChatMessage,
   useChatMessageStore,
@@ -89,7 +88,8 @@ export const SimpleChat = () => {
     <div>
       <div className="mb-4 flex justify-between">
         <h1 className="text-2xl font-bold">Chat</h1>
-        <Link
+        {/* using an <a> because we need a full refresh to disconnect pusher */}
+        <a
           className={buttonVariants({
             variant: "outline",
           })}
@@ -97,7 +97,7 @@ export const SimpleChat = () => {
         >
           <DoorOpen className="size-4" />
           Leave
-        </Link>
+        </a>
       </div>
       <div className="mx-auto flex h-[500px] w-full max-w-2xl flex-col overflow-hidden rounded-lg border">
         <div ref={scrollAreaRef} className="relative grow overflow-y-auto p-4">
