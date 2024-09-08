@@ -11,6 +11,7 @@ import {
 } from "openpgp";
 import { err, ok } from "neverthrow";
 import _ from "lodash";
+import { isErrorWithMessage } from "./utils";
 
 type EncryptAndSignArgs = {
   text: string;
@@ -70,21 +71,25 @@ export const verifySignature = async ({
   }
 
   const [messageToVerify, signatureToVerify] = await Promise.all([
+    // if you want to simulate a failed signature
+    // add some text to decryptedMessage.value
     createMessage({ text: decryptedMessage.value }),
     readSignature({ armoredSignature }),
   ]);
-
-  const verification = await verify({
-    message: messageToVerify,
-    signature: signatureToVerify,
-    verificationKeys: sender.publicKey,
-  });
-
   try {
+    const verification = await verify({
+      message: messageToVerify,
+      signature: signatureToVerify,
+      verificationKeys: sender.publicKey,
+    });
+
     await verification.signatures[0]?.verified; // throws on invalid signature
     return ok(true as const);
-  } catch (e) {
-    return err(e);
+  } catch (error) {
+    if (isErrorWithMessage(error)) {
+      return err(error.message);
+    }
+    return err("Failed to verify signature.");
   }
 };
 
@@ -95,12 +100,16 @@ export const decryptText = async (text: string) => {
     return err("No private key found while decrypting message!");
   }
 
-  const decrypted = await decrypt({
-    message: await readMessage({ armoredMessage: text }),
-    decryptionKeys: privateKey,
-  });
+  try {
+    const decrypted = await decrypt({
+      message: await readMessage({ armoredMessage: text }),
+      decryptionKeys: privateKey,
+    });
 
-  // disabled because of https://github.com/openpgpjs/openpgpjs/issues/1546
-  // eslint-disable-next-line @typescript-eslint/no-base-to-string
-  return ok(decrypted.data.toString());
+    // disabled because of https://github.com/openpgpjs/openpgpjs/issues/1546
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    return ok(decrypted.data.toString());
+  } catch {
+    return err("Failed to decrypt. Probably the participant is not trusted.");
+  }
 };

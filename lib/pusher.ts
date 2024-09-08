@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 import { err, ok, type Result } from "neverthrow";
 import { useQuery } from "@tanstack/react-query";
+import { useChatMessageStore } from "@/data/chat-message-store";
 
 type IntroductionEvent = z.infer<typeof IntroductionEvent>;
 const IntroductionEvent = z.object({
@@ -46,11 +47,24 @@ const EncryptedMessageEvent = z.object({
   recipients: z.array(z.string().min(1)),
 });
 
+type ChatMessageEvent = z.infer<typeof ChatMessageEvent>;
+const ChatMessageEvent = z.object({
+  type: z.literal("chat-message"),
+  id: z.string().min(1),
+  content: z.object({
+    encryptedText: z.string().min(1),
+    signature: z.string().min(1),
+  }),
+  sender: z.string().min(1),
+  timestamp: z.number(),
+});
+
 export type PusherEvent = z.infer<typeof PusherEvent>;
 const PusherEvent = z.discriminatedUnion("type", [
   IntroductionEvent,
   IntroductionResponseEvent,
   EncryptedMessageEvent,
+  ChatMessageEvent, // Add this line
 ]);
 
 const EventHandlers = {
@@ -172,6 +186,31 @@ const EventHandlers = {
       validSignatures: labelVerification.isOk() && messageVerification.isOk(),
     });
   },
+  "chat-message": async (event: ChatMessageEvent) => {
+    const sender = useParticipantStore
+      .getState()
+      .participants.find((p) => p.publicKey.getFingerprint() === event.sender);
+
+    if (sender === undefined) {
+      toast({
+        title: "Error unknown sender",
+        description:
+          "Please refresh the participants list or start a new session.",
+      });
+      return;
+    }
+    // check if the sender is not blocked
+    if (sender.trustLevel === "blocked") {
+      return;
+    }
+
+    useChatMessageStore.getState().addMessage({
+      id: event.id,
+      content: event.content,
+      sender: event.sender,
+      timestamp: event.timestamp,
+    });
+  },
 } as const;
 
 const handlePusherEvent = (event: unknown) => {
@@ -192,6 +231,9 @@ const handlePusherEvent = (event: unknown) => {
     return EventHandlers[parsedEvent.data.type](parsedEvent.data);
   }
   if (parsedEvent.data.type === "encrypted-message") {
+    return EventHandlers[parsedEvent.data.type](parsedEvent.data);
+  }
+  if (parsedEvent.data.type === "chat-message") {
     return EventHandlers[parsedEvent.data.type](parsedEvent.data);
   }
 

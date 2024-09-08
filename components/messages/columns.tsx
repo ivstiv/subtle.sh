@@ -17,15 +17,10 @@ import { OverlappingAvatars } from "../ui/overlapping-avatars";
 import { CopyEncryptedText } from "../copy-encrypted-text";
 import { useMessageStore } from "@/data/message-store";
 import { toast } from "../ui/use-toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { MessagePreview } from "../message-preview";
 import { NewMessageDialog } from "../new-message/new-message-dialog";
 import { getAvatarUrl } from "@/lib/utils";
+import { SignatureShield } from "../signature-shield";
 
 type MessageRow = {
   id: string;
@@ -42,22 +37,14 @@ export const columns: ColumnDef<MessageRow>[] = [
     header: "Label",
     cell: ({ row }) => {
       return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="max-w-96 cursor-pointer overflow-hidden text-ellipsis font-bold">
-                {`${row.original.label.validSignatures ? "✅" : "❌"} ${row.original.label.plainText}`}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                {row.original.label.validSignatures
-                  ? "Valid signature."
-                  : "Invalid signatures!!! Do not trust the contents of this secret!"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex max-w-96 items-center overflow-hidden">
+          <SignatureShield
+            isValidSignature={row.original.label.validSignatures}
+          />
+          <span className="ml-2 cursor-pointer text-ellipsis font-bold">
+            {row.original.label.plainText}
+          </span>
+        </div>
       );
     },
   },
