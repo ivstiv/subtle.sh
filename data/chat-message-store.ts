@@ -17,12 +17,17 @@ type ChatMessageStore = {
 };
 
 export const useChatMessageStore = create<ChatMessageStore>()(
-  devtools((set) => ({
-    messages: [],
-    addMessage: (message) => {
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
+  devtools(
+    (set) => ({
+      messages: [],
+      addMessage: (message) => {
+        set((state) => ({
+          messages: [...state.messages, message],
+        }));
+      },
+    }),
+    {
+      name: "chat-message-store",
     },
-  })),
+  ),
 );

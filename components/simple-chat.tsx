@@ -85,13 +85,13 @@ export const SimpleChat = () => {
   }, [messages]);
 
   return (
-    <div>
+    <div className="w-full">
       <div className="mb-4 flex justify-between">
         <h1 className="text-2xl font-bold">Chat</h1>
-        {/* using an <a> because we need a full refresh to disconnect pusher */}
+        {/* using an <a> because we need a full refresh to disconnect pusher and clear local state */}
         <a
           className={buttonVariants({
-            variant: "outline",
+            variant: "destructive",
           })}
           href="/"
         >
@@ -99,7 +99,7 @@ export const SimpleChat = () => {
           Leave
         </a>
       </div>
-      <div className="mx-auto flex h-[500px] w-full max-w-2xl flex-col overflow-hidden rounded-lg border">
+      <div className="mx-auto flex h-[500px] w-full flex-col overflow-hidden rounded-lg border">
         <div ref={scrollAreaRef} className="relative grow overflow-y-auto p-4">
           {messages.length > 0 ? (
             <div className="space-y-4">
