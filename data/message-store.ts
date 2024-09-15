@@ -2,15 +2,20 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 export const useMessageStore = create<MessagesStore>()(
-  devtools((set) => ({
-    messages: [],
-    addMessage: (message) => {
-      set((state) => ({
-        ...state,
-        messages: [...state.messages, message],
-      }));
+  devtools(
+    (set) => ({
+      messages: [],
+      addMessage: (message) => {
+        set((state) => ({
+          ...state,
+          messages: [...state.messages, message],
+        }));
+      },
+    }),
+    {
+      name: "message-store",
     },
-  })),
+  ),
 );
 
 export type EncryptedMessage = {

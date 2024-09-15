@@ -19,68 +19,75 @@ export const defaultServer: Server = {
 };
 
 export const useGlobalStore = create<GlobalStore>()(
-  devtools((set, get) => ({
-    channel: initialisePusher(),
-    username: IS_SERVER ? "" : (localStorage.getItem("username") ?? ""),
-    myKeys: {
-      public: undefined,
-      private: undefined,
-    },
-    setUsername: (username) => {
-      if (!IS_SERVER) {
-        localStorage.setItem("username", username);
-      }
+  devtools(
+    (set, get) => ({
+      channel: initialisePusher(),
+      username: IS_SERVER ? "" : (localStorage.getItem("username") ?? ""),
+      myKeys: {
+        public: undefined,
+        private: undefined,
+      },
+      setUsername: (username) => {
+        if (!IS_SERVER) {
+          localStorage.setItem("username", username);
+        }
 
-      set((state) => ({
-        ...state,
-        username,
-      }));
+        set((state) => ({
+          ...state,
+          username,
+        }));
+      },
+      setMyKeys: (keys) => {
+        set((state) => ({
+          ...state,
+          myKeys: keys,
+        }));
+      },
+      sendPusherEvent: (event) => {
+        return get().channel?.trigger("client-event", event) ?? false;
+      },
+      servers: IS_SERVER
+        ? [defaultServer]
+        : [
+            defaultServer,
+            ...(JSON.parse(
+              localStorage.getItem("servers") ?? "[]",
+            ) as Server[]),
+          ],
+      selectedServer: IS_SERVER
+        ? defaultServer.domain
+        : (localStorage.getItem("selectedServer") ?? defaultServer.domain),
+      addServer: (newServer) => {
+        if (!IS_SERVER) {
+          const currentServers = get().servers;
+          const updatedServers = [...currentServers, newServer];
+          localStorage.setItem("servers", JSON.stringify(updatedServers));
+        }
+        set((state) => ({ servers: [...state.servers, newServer] }));
+      },
+      removeServer: (domain) => {
+        if (!IS_SERVER) {
+          const currentServers = get().servers;
+          const updatedServers = currentServers.filter(
+            (s: Server) => s.domain !== domain,
+          );
+          localStorage.setItem("servers", JSON.stringify(updatedServers));
+        }
+        set((state) => ({
+          servers: state.servers.filter((s) => s.domain !== domain),
+        }));
+      },
+      setSelectedServer: (domain: string) => {
+        if (!IS_SERVER) {
+          localStorage.setItem("selectedServer", domain);
+        }
+        set((state) => ({ ...state, selectedServer: domain }));
+      },
+    }),
+    {
+      name: "global-store",
     },
-    setMyKeys: (keys) => {
-      set((state) => ({
-        ...state,
-        myKeys: keys,
-      }));
-    },
-    sendPusherEvent: (event) => {
-      return get().channel?.trigger("client-event", event) ?? false;
-    },
-    servers: IS_SERVER
-      ? [defaultServer]
-      : [
-          defaultServer,
-          ...(JSON.parse(localStorage.getItem("servers") ?? "[]") as Server[]),
-        ],
-    selectedServer: IS_SERVER
-      ? defaultServer.domain
-      : (localStorage.getItem("selectedServer") ?? defaultServer.domain),
-    addServer: (newServer) => {
-      if (!IS_SERVER) {
-        const currentServers = get().servers;
-        const updatedServers = [...currentServers, newServer];
-        localStorage.setItem("servers", JSON.stringify(updatedServers));
-      }
-      set((state) => ({ servers: [...state.servers, newServer] }));
-    },
-    removeServer: (domain) => {
-      if (!IS_SERVER) {
-        const currentServers = get().servers;
-        const updatedServers = currentServers.filter(
-          (s: Server) => s.domain !== domain,
-        );
-        localStorage.setItem("servers", JSON.stringify(updatedServers));
-      }
-      set((state) => ({
-        servers: state.servers.filter((s) => s.domain !== domain),
-      }));
-    },
-    setSelectedServer: (domain: string) => {
-      if (!IS_SERVER) {
-        localStorage.setItem("selectedServer", domain);
-      }
-      set((state) => ({ ...state, selectedServer: domain }));
-    },
-  })),
+  ),
 );
 
 type GlobalStore = {
